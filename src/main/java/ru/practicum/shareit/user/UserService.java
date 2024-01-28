@@ -22,8 +22,8 @@ public class UserService {
     }
 
     public UserDto getUsersById(int id) {
-        return userMapper.getUserDto(userStorage.getUsersById(id).
-                orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + id + " не найден.")));
+        return userMapper.getUserDto(userStorage.getUsersById(id)
+                .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + id + " не найден.")));
     }
 
     public UserDto create(UserDto userDto) {
@@ -32,8 +32,8 @@ public class UserService {
     }
 
     public UserDto update(int id, UserDto userDto) {
-        User user = User.getCopy(userStorage.getUsersById(id).
-                orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + id + " не найден.")));
+        User user = User.getCopy(userStorage.getUsersById(id)
+                .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + id + " не найден.")));
         user = userMapper.updateUserFromDto(user, userDto);
         return userMapper.getUserDto(userStorage.update(id, user));
     }

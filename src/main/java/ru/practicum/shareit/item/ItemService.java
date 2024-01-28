@@ -37,15 +37,15 @@ public class ItemService {
     public ItemDto getItemById(int userId, int id) {
         userStorage.getUsersById(userId)
                 .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + userId + " не найден."));
-        return itemMapper.getItemDto(itemStorage.getItemById(id).
-                orElseThrow(() -> new DataNotFoundException("Вещи с id=" + id + " нет.")));
+        return itemMapper.getItemDto(itemStorage.getItemById(id)
+                .orElseThrow(() -> new DataNotFoundException("Вещи с id=" + id + " нет.")));
     }
 
     public ItemDto update(int userId, int id, ItemDto itemDto) {
         userStorage.getUsersById(userId)
                 .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + userId + " не найден."));
-        Item item = Item.getCopy(itemStorage.getItemById(id).
-                orElseThrow(() -> new DataNotFoundException("Вещи с id=" + id + " нет.")));
+        Item item = Item.getCopy(itemStorage.getItemById(id)
+                .orElseThrow(() -> new DataNotFoundException("Вещи с id=" + id + " нет.")));
         if (item.getOwnerId() != userId) {
             throw new WrongAccesException("У вещи с id=" + id + " другой владелец.");
         }
