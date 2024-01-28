@@ -26,7 +26,7 @@ public class InMemoryItemStorage implements ItemStorage {
 
     @Override
     public List<Item> getItems(int userId) {
-        return new ArrayList<>(userItemIndex.get(userId).values());
+        return new ArrayList<>(userItemIndex.getOrDefault(userId, Map.of()).values());
     }
 
     @Override
