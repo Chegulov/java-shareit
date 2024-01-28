@@ -21,7 +21,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public List<UserDto> getUsers(){
+    public List<UserDto> getUsers() {
         return userService.getUsers();
     }
 
@@ -36,7 +36,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public UserDto update(@PathVariable int id , @Valid @RequestBody UserDto userDto) {
+    public UserDto update(@PathVariable int id, @Valid @RequestBody UserDto userDto) {
         return userService.update(id, userDto);
     }
 

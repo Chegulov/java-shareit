@@ -31,7 +31,7 @@ public class InMemoryItemStorage implements ItemStorage {
     public List<ItemDto> getItems(int userId) {
         return items.values().stream()
                 .filter(item -> item.getOwnerId() == userId)
-                .map(itemMapper :: getItemDto)
+                .map(itemMapper::getItemDto)
                 .collect(Collectors.toList());
     }
 
@@ -59,7 +59,7 @@ public class InMemoryItemStorage implements ItemStorage {
                 .filter(item -> (item.getDescription().toLowerCase().contains(finalText)
                         || item.getName().toLowerCase().contains(finalText)))
                 .filter(Item::getAvailable)
-                .map(itemMapper :: getItemDto)
+                .map(itemMapper::getItemDto)
                 .collect(Collectors.toList());
     }
 }
