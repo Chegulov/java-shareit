@@ -5,37 +5,32 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exception.DataNotFoundException;
 import ru.practicum.shareit.exception.DuplicateDataException;
-import ru.practicum.shareit.user.UserMapper;
-import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Component
 public class InMemoryUserStorage implements UserStorage {
 
     private final Map<Integer, User> users;
-    private final UserMapper userMapper;
     private int id = 0;
 
     @Override
-    public List<UserDto> getUsers() {
-        return users.values().stream().map(userMapper::getUserDto).collect(Collectors.toList());
+    public List<User> getUsers() {
+        return new ArrayList<>(users.values());
     }
 
     @Override
-    public UserDto getUsersById(int id) {
-        if (!users.containsKey(id)) {
-            throw new DataNotFoundException("Пользователь с id=" + id + " не найден.");
-        }
-        return userMapper.getUserDto(users.get(id));
+    public Optional<User> getUsersById(int id) {
+        return Optional.ofNullable(users.get(id));
     }
 
     @Override
-    public UserDto create(User user) {
+    public User create(User user) {
         if (checkEmail(user.getEmail())) {
             throw new DuplicateDataException("Пользователь с таким email уже зарегистрирован");
         }
@@ -43,23 +38,19 @@ public class InMemoryUserStorage implements UserStorage {
         id++;
         user.setId(id);
         users.put(id, user);
-        return userMapper.getUserDto(user);
+        return user;
     }
 
     @Override
-    public UserDto update(int id, UserDto userDto) {
-        if (!users.containsKey(id)) {
-            throw new DataNotFoundException("Пользователь с id=" + id + " не найден.");
-        }
+    public User update(int id, User updatedUser) {
         User user = users.get(id);
         users.remove(id);
-        if (checkEmail(userDto.getEmail())) {
+        if (checkEmail(updatedUser.getEmail())) {
             users.put(id, user);
             throw new DuplicateDataException("Пользователь с таким email уже зарегистрирован");
         }
-        user = userMapper.updateUserFromDto(user, userDto);
-        users.put(id, user);
-        return userMapper.getUserDto(user);
+        users.put(id, updatedUser);
+        return updatedUser;
     }
 
     @Override

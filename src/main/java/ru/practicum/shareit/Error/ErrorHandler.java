@@ -19,9 +19,9 @@ import java.util.Map;
 @RestControllerAdvice
 public class ErrorHandler {
 
-    @ExceptionHandler
+    @ExceptionHandler({DataNotFoundException.class, WrongAccesException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNotFoundException(final DataNotFoundException e) {
+    public ErrorResponse handleNotFoundException(final RuntimeException e) {
         log.error(e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
@@ -29,13 +29,6 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public  ErrorResponse handleDuplicateException(final DuplicateDataException e) {
-        log.error(e.getMessage());
-        return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public  ErrorResponse handleWrongAccesException(final WrongAccesException e) {
         log.error(e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
@@ -57,6 +50,13 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MissingRequestHeaderException.class)
     public ErrorResponse handleMissingRequestHeaderException(final MissingRequestHeaderException e) {
+        log.error(e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleOtherException(final Throwable e) {
         log.error(e.getMessage());
         return new ErrorResponse(e.getMessage());
     }

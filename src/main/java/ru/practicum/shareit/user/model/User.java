@@ -6,10 +6,6 @@ import lombok.Data;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
-/**
- * TODO Sprint add-controllers.
- */
-
 @Data
 @Builder
 public class User {
@@ -19,4 +15,12 @@ public class User {
     private String email;
     @NotBlank
     private String name;
+
+    public static User getCopy(User user) {
+        return User.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .name(user.getName())
+                .build();
+    }
 }

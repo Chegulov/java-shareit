@@ -2,64 +2,52 @@ package ru.practicum.shareit.item.storage;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.exception.WrongAccesException;
-import ru.practicum.shareit.item.ItemMapper;
-import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Component
 public class InMemoryItemStorage implements ItemStorage {
     private final Map<Integer, Item> items;
-    private final ItemMapper itemMapper;
+    private final Map<Integer, Map<Integer, Item>> userItemIndex;
     private int id = 0;
 
     @Override
-    public ItemDto create(int userId, Item item) {
+    public Item create(int userId, Item item) {
         id++;
         item.setId(id);
         item.setOwnerId(userId);
         items.put(id, item);
-        return itemMapper.getItemDto(item);
+        userItemIndex.computeIfAbsent(userId, k -> new HashMap<>()).put(id, item);
+        return item;
     }
 
     @Override
-    public List<ItemDto> getItems(int userId) {
-        return items.values().stream()
-                .filter(item -> item.getOwnerId() == userId)
-                .map(itemMapper::getItemDto)
-                .collect(Collectors.toList());
+    public List<Item> getItems(int userId) {
+        return new ArrayList<>(userItemIndex.get(userId).values());
     }
 
     @Override
-    public ItemDto getItemById(int userId, int id) {
-        return itemMapper.getItemDto(items.get(id));
+    public Optional<Item> getItemById(int id) {
+        return Optional.ofNullable(items.get(id));
     }
 
     @Override
-    public ItemDto update(int userId, int id, ItemDto itemDto) {
-        if (items.get(id).getOwnerId() != userId) {
-           throw new WrongAccesException("У вещи с id=" + id + " другой владелец.");
-        }
-
-        Item item = items.get(id);
-        item = itemMapper.updateItemFromDto(item, itemDto);
+    public Item update(int userId, int id, Item item) {
         items.put(id, item);
-        return itemMapper.getItemDto(item);
+        userItemIndex.get(userId).put(id, item);
+        return item;
     }
 
     @Override
-    public List<ItemDto> getItemByText(String text) {
+    public List<Item> getItemByText(String text) {
         String finalText = text.toLowerCase();
         return items.values().stream()
                 .filter(item -> (item.getDescription().toLowerCase().contains(finalText)
-                        || item.getName().toLowerCase().contains(finalText)))
-                .filter(Item::getAvailable)
-                .map(itemMapper::getItemDto)
+                        || item.getName().toLowerCase().contains(finalText))
+                        && item.getAvailable())
                 .collect(Collectors.toList());
     }
 }
