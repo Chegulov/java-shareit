@@ -1,18 +1,17 @@
 package ru.practicum.shareit.item.storage;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface ItemStorage {
-    Item create(int userId, Item item);
+public interface ItemStorage extends JpaRepository<Item, Long>, QuerydslPredicateExecutor<Item> {
+    List<Item> findAllByOwnerId(Long ownerId);
 
-    List<Item> getItems(int userId);
-
-    Optional<Item> getItemById(int id);
-
-    Item update(int userId, int id, Item item);
-
-    List<Item> getItemByText(String text);
+    @Query("SELECT i FROM Item as i " +
+            "WHERE upper(i.name) LIKE upper(concat('%', ?1, '%')) " +
+            "OR upper(i.description) LIKE upper(concat('%', ?1, '%'))")
+    List<Item> findItemByText(String text);
 }

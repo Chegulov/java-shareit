@@ -7,6 +7,7 @@ import ru.practicum.shareit.exception.WrongAccesException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemStorage;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserStorage;
 
 import java.util.List;
@@ -19,47 +20,50 @@ public class ItemService {
     private final UserStorage userStorage;
     private final ItemMapper itemMapper;
 
-    public ItemDto create(int userId, ItemDto itemDto) {
-        userStorage.getUsersById(userId)
+    public ItemDto create(Long userId, ItemDto itemDto) {
+        User user = userStorage.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + userId + " не найден."));
         Item item = itemMapper.createItemFromDto(userId, itemDto);
-        return itemMapper.getItemDto(itemStorage.create(userId, item));
+        item.setOwner(user);
+        return itemMapper.getItemDto(itemStorage.save(item));
     }
 
-    public List<ItemDto> getItems(int userId) {
-        userStorage.getUsersById(userId)
+    public List<ItemDto> getItems(Long userId) {
+        userStorage.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + userId + " не найден."));
-        return itemStorage.getItems(userId).stream()
+        return itemStorage.findAllByOwnerId(userId).stream()
                 .map(itemMapper::getItemDto)
                 .collect(Collectors.toList());
     }
 
-    public ItemDto getItemById(int userId, int id) {
-        userStorage.getUsersById(userId)
+    public ItemDto getItemById(Long userId, Long id) {
+        userStorage.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + userId + " не найден."));
-        return itemMapper.getItemDto(itemStorage.getItemById(id)
+        return itemMapper.getItemDto(itemStorage.findById(id)
                 .orElseThrow(() -> new DataNotFoundException("Вещи с id=" + id + " нет.")));
     }
 
-    public ItemDto update(int userId, int id, ItemDto itemDto) {
-        userStorage.getUsersById(userId)
+    public ItemDto update(Long userId, Long id, ItemDto itemDto) {
+        userStorage.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + userId + " не найден."));
-        Item item = Item.getCopy(itemStorage.getItemById(id)
-                .orElseThrow(() -> new DataNotFoundException("Вещи с id=" + id + " нет.")));
-        if (item.getOwnerId() != userId) {
+        Item item = itemStorage.findById(id)
+                .orElseThrow(() -> new DataNotFoundException("Вещи с id=" + id + " нет."));
+        if (item.getOwner().getId() != userId) {
             throw new WrongAccesException("У вещи с id=" + id + " другой владелец.");
         }
         item = itemMapper.updateItemFromDto(item, itemDto);
 
-        return itemMapper.getItemDto(itemStorage.update(userId, id, item));
+        return itemMapper.getItemDto(itemStorage.save(item));
     }
 
-    public List<ItemDto> getItemByText(int userId, String text) {
-        userStorage.getUsersById(userId);
+    public List<ItemDto> getItemByText(Long userId, String text) {
+        userStorage.findById(userId)
+                .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + userId + " не найден."));
         if (text.isBlank()) {
             return List.of();
         }
-        return itemStorage.getItemByText(text).stream()
+        return itemStorage.findItemByText(text).stream()
+                .filter(Item::getAvailable)
                 .map(itemMapper::getItemDto)
                 .collect(Collectors.toList());
     }
