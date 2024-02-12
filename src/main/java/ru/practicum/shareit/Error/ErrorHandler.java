@@ -8,9 +8,7 @@ import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.practicum.shareit.exception.DataNotFoundException;
-import ru.practicum.shareit.exception.DuplicateDataException;
-import ru.practicum.shareit.exception.WrongAccesException;
+import ru.practicum.shareit.exception.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,8 +46,11 @@ public class ErrorHandler {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MissingRequestHeaderException.class)
-    public ErrorResponse handleMissingRequestHeaderException(final MissingRequestHeaderException e) {
+    @ExceptionHandler({MissingRequestHeaderException.class,
+            ItemAvailabilityException.class,
+            WrongStateException.class,
+            WrongStatusException.class})
+    public ErrorResponse handleMissingRequestHeaderException(final RuntimeException e) {
         log.error(e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
