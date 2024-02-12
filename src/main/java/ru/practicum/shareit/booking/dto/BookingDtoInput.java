@@ -6,9 +6,6 @@ import ru.practicum.shareit.annotation.StartEndOfBookingValidation;
 
 import java.time.LocalDateTime;
 
-/**
- * TODO Sprint add-bookings.
- */
 @Data
 @Builder
 @StartEndOfBookingValidation

@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class BookingServiceImpl implements BookingService{
+public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
@@ -69,7 +69,7 @@ public class BookingServiceImpl implements BookingService{
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new DataNotFoundException("Бронирование с id=" + bookingId + " не найдено."));
 
-        if(booking.getBooker().getId() != userId && booking.getItem().getOwner().getId() != userId) {
+        if (booking.getBooker().getId() != userId && booking.getItem().getOwner().getId() != userId) {
             throw new DataNotFoundException("Бронирование с id=" + bookingId
                     + " не найдено для пользователя с id=" + userId);
         }
