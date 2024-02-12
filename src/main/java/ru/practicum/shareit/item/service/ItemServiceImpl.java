@@ -71,7 +71,7 @@ public class ItemServiceImpl implements ItemService {
         Booking lastBooking = findLastBooking(id);
         Booking nextBooking = findNextBooking(id);
 
-        if (userId == item.getOwner().getId()) {
+        if (userId.equals(item.getOwner().getId())) {
             return itemMapper.getItemDto(item,
                     bookingMapper.createBookingItemDto(lastBooking),
                     bookingMapper.createBookingItemDto(nextBooking),
@@ -91,7 +91,7 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + userId + " не найден."));
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new DataNotFoundException("Вещи с id=" + id + " нет."));
-        if (item.getOwner().getId() != userId) {
+        if (!userId.equals(item.getOwner().getId())) {
             throw new WrongAccesException("У вещи с id=" + id + " другой владелец.");
         }
         item = itemMapper.updateItemFromDto(item, itemDto);

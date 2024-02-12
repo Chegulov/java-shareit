@@ -33,7 +33,7 @@ public class BookingServiceImpl implements BookingService {
         Item item = itemRepository.findById(bookingDtoInput.getItemId())
                 .orElseThrow(() -> new DataNotFoundException("Вещи с id=" + bookingDtoInput.getItemId() + " нет."));
 
-        if (item.getOwner().getId() == bookerId) {
+        if (bookerId.equals(item.getOwner().getId())) {
             throw new DataNotFoundException("невозможно забронировать свою же вещь.");
         }
 
@@ -51,7 +51,7 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new DataNotFoundException("Бронирование с id=" + bookingId + " не найдено."));
 
-        if (booking.getItem().getOwner().getId() != ownerId) {
+        if (!ownerId.equals(booking.getItem().getOwner().getId())) {
             throw new WrongAccesException("Пользователь с id=" + ownerId
                     + " не может менять статус бронирования с id=" + bookingId);
         }
@@ -69,7 +69,7 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new DataNotFoundException("Бронирование с id=" + bookingId + " не найдено."));
 
-        if (booking.getBooker().getId() != userId && booking.getItem().getOwner().getId() != userId) {
+        if (!userId.equals(booking.getBooker().getId()) && !userId.equals(booking.getItem().getOwner().getId())) {
             throw new DataNotFoundException("Бронирование с id=" + bookingId
                     + " не найдено для пользователя с id=" + userId);
         }
