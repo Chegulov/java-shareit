@@ -81,37 +81,25 @@ public class BookingServiceImpl implements BookingService {
         userRepository.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + userId + " не найден."));
 
-        switch (state) {
+        switch (state.toUpperCase()) {
             case "CURRENT":
-                return bookingRepository.readAllBookerCurrentBookings(userId, LocalDateTime.now())
-                        .stream()
-                        .map(bookingMapper::createDtoOutput)
-                        .collect(Collectors.toList());
+                return bookingMapper.createDtoOutputList(bookingRepository
+                        .readAllBookerCurrentBookings(userId, LocalDateTime.now()));
             case "PAST":
-                return bookingRepository.readAllBookerPastBookings(userId, LocalDateTime.now())
-                        .stream()
-                        .map(bookingMapper::createDtoOutput)
-                        .collect(Collectors.toList());
+                return bookingMapper.createDtoOutputList(bookingRepository
+                        .readAllBookerPastBookings(userId, LocalDateTime.now()));
             case "FUTURE":
-                return bookingRepository.readAllBookerFutureBookings(userId, LocalDateTime.now())
-                        .stream()
-                        .map(bookingMapper::createDtoOutput)
-                        .collect(Collectors.toList());
+                return bookingMapper.createDtoOutputList(bookingRepository
+                        .readAllBookerFutureBookings(userId, LocalDateTime.now()));
             case "WAITING":
-                return bookingRepository.findAllByBooker_IdAndStatusOrderByStartTimeDesc(userId, BookingStatus.WAITING)
-                        .stream()
-                        .map(bookingMapper::createDtoOutput)
-                        .collect(Collectors.toList());
+                return bookingMapper.createDtoOutputList(bookingRepository
+                        .findAllByBooker_IdAndStatusOrderByStartTimeDesc(userId, BookingStatus.WAITING));
             case "REJECTED":
-                return bookingRepository.findAllByBooker_IdAndStatusOrderByStartTimeDesc(userId, BookingStatus.REJECTED)
-                        .stream()
-                        .map(bookingMapper::createDtoOutput)
-                        .collect(Collectors.toList());
+                return bookingMapper.createDtoOutputList(bookingRepository
+                        .findAllByBooker_IdAndStatusOrderByStartTimeDesc(userId, BookingStatus.REJECTED));
             case "ALL":
-                return bookingRepository.findAllByBooker_IdOrderByStartTimeDesc(userId)
-                        .stream()
-                        .map(bookingMapper::createDtoOutput)
-                        .collect(Collectors.toList());
+                return bookingMapper.createDtoOutputList(bookingRepository
+                        .findAllByBooker_IdOrderByStartTimeDesc(userId));
             default:
                 throw new WrongStateException("Unknown state: UNSUPPORTED_STATUS");
         }
@@ -127,37 +115,25 @@ public class BookingServiceImpl implements BookingService {
                 .map(Item::getId)
                 .collect(Collectors.toList());
 
-        switch (state) {
+        switch (state.toUpperCase()) {
             case "CURRENT":
-                return bookingRepository.readAllOwnerItemsCurrentBookings(itemIds, LocalDateTime.now())
-                        .stream()
-                        .map(bookingMapper::createDtoOutput)
-                        .collect(Collectors.toList());
+                return bookingMapper.createDtoOutputList(bookingRepository
+                        .readAllOwnerItemsCurrentBookings(itemIds, LocalDateTime.now()));
             case "PAST":
-                return bookingRepository.readAllOwnerItemsPastBookings(itemIds, LocalDateTime.now())
-                        .stream()
-                        .map(bookingMapper::createDtoOutput)
-                        .collect(Collectors.toList());
+                return bookingMapper.createDtoOutputList(bookingRepository
+                        .readAllOwnerItemsPastBookings(itemIds, LocalDateTime.now()));
             case "FUTURE":
-                return bookingRepository.readAllOwnerItemsFutureBookings(itemIds, LocalDateTime.now())
-                        .stream()
-                        .map(bookingMapper::createDtoOutput)
-                        .collect(Collectors.toList());
+                return bookingMapper.createDtoOutputList(bookingRepository
+                        .readAllOwnerItemsFutureBookings(itemIds, LocalDateTime.now()));
             case "WAITING":
-                return bookingRepository.findAllByItem_IdInAndStatusInOrderByStartTimeDesc(itemIds, List.of(BookingStatus.WAITING))
-                        .stream()
-                        .map(bookingMapper::createDtoOutput)
-                        .collect(Collectors.toList());
+                return bookingMapper.createDtoOutputList(bookingRepository
+                        .findAllByItem_IdInAndStatusInOrderByStartTimeDesc(itemIds, List.of(BookingStatus.WAITING)));
             case "REJECTED":
-                return bookingRepository.findAllByItem_IdInAndStatusInOrderByStartTimeDesc(itemIds, List.of(BookingStatus.REJECTED))
-                        .stream()
-                        .map(bookingMapper::createDtoOutput)
-                        .collect(Collectors.toList());
+                return bookingMapper.createDtoOutputList(bookingRepository
+                        .findAllByItem_IdInAndStatusInOrderByStartTimeDesc(itemIds, List.of(BookingStatus.REJECTED)));
             case "ALL":
-                return bookingRepository.findAllByItem_IdInOrderByStartTimeDesc(itemIds)
-                        .stream()
-                        .map(bookingMapper::createDtoOutput)
-                        .collect(Collectors.toList());
+                return bookingMapper.createDtoOutputList(bookingRepository
+                        .findAllByItem_IdInOrderByStartTimeDesc(itemIds));
             default:
                 throw new WrongStateException("Unknown state: UNSUPPORTED_STATUS");
         }

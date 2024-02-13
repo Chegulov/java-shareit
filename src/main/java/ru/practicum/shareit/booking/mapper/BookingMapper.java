@@ -12,6 +12,9 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 @RequiredArgsConstructor
 public class BookingMapper {
@@ -48,5 +51,11 @@ public class BookingMapper {
                 .id(booking.getId())
                 .bookerId(booking.getBooker().getId())
                 .build();
+    }
+
+    public List<BookingDtoOutput> createDtoOutputList(List<Booking> bookings) {
+        return bookings.stream()
+                .map(this::createDtoOutput)
+                .collect(Collectors.toList());
     }
 }
