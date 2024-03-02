@@ -79,18 +79,18 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + userId + " не найден."));
         Item item = itemRepository.findById(id)
                         .orElseThrow(() -> new DataNotFoundException("Вещи с id=" + id + " нет."));
-        Booking lastBooking = findLastBooking(id);
-        Booking nextBooking = findNextBooking(id);
 
         if (userId.equals(item.getOwner().getId())) {
+            Booking lastBooking = findLastBooking(id);
+            Booking nextBooking = findNextBooking(id);
+
             return itemMapper.getItemDto(item,
                     bookingMapper.createBookingItemDto(lastBooking),
                     bookingMapper.createBookingItemDto(nextBooking),
                     findComments(id));
         }
 
-        return itemMapper.getItemDto(itemRepository.findById(id)
-                .orElseThrow(() -> new DataNotFoundException("Вещи с id=" + id + " нет.")),
+        return itemMapper.getItemDto(item,
                 null,
                 null,
                 findComments(id));

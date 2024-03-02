@@ -13,9 +13,6 @@ import java.util.List;
 
 import static ru.practicum.shareit.constant.CustomHeaders.USER_ID;
 
-/**
- * TODO Sprint add-item-requests.
- */
 @Validated
 @RequiredArgsConstructor
 @RestController
