@@ -59,7 +59,7 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDto> getItems(Long userId, Integer start, Integer size) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + userId + " не найден."));
-        Pageable pageable = PageRequest.of(start/size, size);
+        Pageable pageable = PageRequest.of(start / size, size);
         return itemRepository.findAllByOwnerId(userId, pageable).stream()
                 .map(item -> {
                     Booking lastBooking = findLastBooking(item.getId());
@@ -120,7 +120,7 @@ public class ItemServiceImpl implements ItemService {
         if (text.isBlank()) {
             return List.of();
         }
-        Pageable pageable = PageRequest.of(start/size, size);
+        Pageable pageable = PageRequest.of(start / size, size);
         return itemRepository.findItemByText(text, pageable).stream()
                 .filter(Item::getAvailable)
                 .map(item -> itemMapper.getItemDto(item,

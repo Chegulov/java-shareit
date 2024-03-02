@@ -316,7 +316,7 @@ public class ItemServiceIntegrationTest {
         UserDto savedOwner = userService.create(userDto);
         UserDto savedBooker = userService.create(user2Dto);
         itemService.create(1L, itemDto);
-        BookingDtoOutput createdBooking = bookingService.create( savedBooker.getId(), lastBooking);
+        BookingDtoOutput createdBooking = bookingService.create(savedBooker.getId(), lastBooking);
         bookingService.updateStatus(savedOwner.getId(), createdBooking.getId(), true);
 
         CommentDto returnedComment = itemService.createComment(2L, 1L, commentDto);

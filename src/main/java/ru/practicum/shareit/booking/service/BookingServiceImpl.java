@@ -82,7 +82,7 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingDtoOutput> getAllBookerBookings(Long userId, String state, Integer start, Integer size) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + userId + " не найден."));
-        Pageable pageable = PageRequest.of(start/size, size);
+        Pageable pageable = PageRequest.of(start / size, size);
 
         switch (state.toUpperCase()) {
             case "CURRENT":
@@ -112,7 +112,7 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingDtoOutput> getAllOwnerItemBookings(Long ownerId, String state, Integer start, Integer size) {
         userRepository.findById(ownerId)
                 .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + ownerId + " не найден."));
-        Pageable pageable = PageRequest.of(start/size, size);
+        Pageable pageable = PageRequest.of(start / size, size);
         List<Long> itemIds = itemRepository.findAllByOwnerId(ownerId)
                 .stream()
                 .map(Item::getId)

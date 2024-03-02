@@ -54,7 +54,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public List<ItemRequestDtoForRequestor> getRequestsByPage(Long userId, Integer start, Integer size) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + userId + " не найден."));
-        Pageable pageable = PageRequest.of(start/size, size, Sort.by("created").descending());
+        Pageable pageable = PageRequest.of(start / size, size, Sort.by("created").descending());
         return itemRequestRepository.findAllByRequestorIdNot(userId, pageable).stream()
                 .map(itemRequest -> itemRequestMapper
                         .getRequestDtoForRequestor(itemRequest, getItemDtosForRequest(itemRequest)))
@@ -70,9 +70,9 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         return itemRequestMapper.getRequestDtoForRequestor(itemRequest, getItemDtosForRequest(itemRequest));
     }
 
-    private List<ItemDtoForRequest> getItemDtosForRequest (ItemRequest itemRequest) {
+    private List<ItemDtoForRequest> getItemDtosForRequest(ItemRequest itemRequest) {
         return itemRepository.findAllByRequestId(itemRequest.getId()).stream()
-                .map(itemMapper :: getItemDtoForRequest)
+                .map(itemMapper::getItemDtoForRequest)
                 .collect(Collectors.toList());
     }
 }
