@@ -1,6 +1,8 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
@@ -17,6 +19,8 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -30,6 +34,7 @@ import java.util.stream.Collectors;
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+    private final ItemRequestRepository itemRequestRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
     private final ItemMapper itemMapper;
@@ -40,16 +45,19 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto create(Long userId, ItemDto itemDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + userId + " не найден."));
-        Item item = itemMapper.createItemFromDto(userId, itemDto);
+        ItemRequest itemRequest = itemDto.getRequestId() != null ?
+                itemRequestRepository.findById(itemDto.getRequestId()).orElse(null) : null;
+        Item item = itemMapper.createItemFromDto(itemDto, itemRequest);
         item.setOwner(user);
         return itemMapper.getItemDto(itemRepository.save(item), null, null, null);
     }
 
     @Override
-    public List<ItemDto> getItems(Long userId) {
+    public List<ItemDto> getItems(Long userId, Integer start, Integer size) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + userId + " не найден."));
-        return itemRepository.findAllByOwnerId(userId).stream()
+        Pageable pageable = PageRequest.of(start / size, size);
+        return itemRepository.findAllByOwnerId(userId, pageable).stream()
                 .map(item -> {
                     Booking lastBooking = findLastBooking(item.getId());
                     Booking nextBooking = findNextBooking(item.getId());
@@ -68,18 +76,18 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + userId + " не найден."));
         Item item = itemRepository.findById(id)
                         .orElseThrow(() -> new DataNotFoundException("Вещи с id=" + id + " нет."));
-        Booking lastBooking = findLastBooking(id);
-        Booking nextBooking = findNextBooking(id);
 
         if (userId.equals(item.getOwner().getId())) {
+            Booking lastBooking = findLastBooking(id);
+            Booking nextBooking = findNextBooking(id);
+
             return itemMapper.getItemDto(item,
                     bookingMapper.createBookingItemDto(lastBooking),
                     bookingMapper.createBookingItemDto(nextBooking),
                     findComments(id));
         }
 
-        return itemMapper.getItemDto(itemRepository.findById(id)
-                .orElseThrow(() -> new DataNotFoundException("Вещи с id=" + id + " нет.")),
+        return itemMapper.getItemDto(item,
                 null,
                 null,
                 findComments(id));
@@ -103,14 +111,14 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getItemByText(Long userId, String text) {
+    public List<ItemDto> getItemByText(Long userId, String text, Integer start, Integer size) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + userId + " не найден."));
         if (text.isBlank()) {
             return List.of();
         }
-
-        return itemRepository.findItemByText(text).stream()
+        Pageable pageable = PageRequest.of(start / size, size);
+        return itemRepository.findItemByText(text, pageable).stream()
                 .filter(Item::getAvailable)
                 .map(item -> itemMapper.getItemDto(item,
                             null,

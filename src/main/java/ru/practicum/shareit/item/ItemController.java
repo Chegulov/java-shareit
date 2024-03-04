@@ -9,10 +9,12 @@ import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.validateGroups.Create;
 import ru.practicum.shareit.validateGroups.Update;
 
+import javax.validation.constraints.Min;
 import java.util.List;
 
 import static ru.practicum.shareit.constant.CustomHeaders.USER_ID;
 
+@Validated
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/items")
@@ -20,13 +22,16 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public ItemDto create(@RequestHeader(USER_ID) Long userId, @Validated(Create.class) @RequestBody ItemDto itemDto) {
+    public ItemDto create(@RequestHeader(USER_ID) Long userId,
+                          @Validated(Create.class) @RequestBody ItemDto itemDto) {
         return itemService.create(userId, itemDto);
     }
 
     @GetMapping
-    public List<ItemDto> getItems(@RequestHeader(USER_ID) Long userId) {
-        return itemService.getItems(userId);
+    public List<ItemDto> getItems(@RequestHeader(USER_ID) Long userId,
+                                  @RequestParam(value = "from", defaultValue = "0") @Min(0) Integer start,
+                                  @RequestParam(value = "size", defaultValue = "10") @Min(1) Integer size) {
+        return itemService.getItems(userId, start, size);
     }
 
     @GetMapping("/{id}")
@@ -41,8 +46,10 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> getItemByText(@RequestHeader(USER_ID) Long userId, @RequestParam (value = "text") String text) {
-        return itemService.getItemByText(userId, text);
+    public List<ItemDto> getItemByText(@RequestHeader(USER_ID) Long userId, @RequestParam (value = "text") String text,
+                                       @RequestParam(value = "from", defaultValue = "0") @Min(0) Integer start,
+                                       @RequestParam(value = "size", defaultValue = "10") @Min(1) Integer size) {
+        return itemService.getItemByText(userId, text, start, size);
     }
 
     @PostMapping("/{itemId}/comment")

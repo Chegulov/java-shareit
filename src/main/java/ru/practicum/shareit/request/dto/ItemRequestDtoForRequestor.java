@@ -2,16 +2,16 @@ package ru.practicum.shareit.request.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import ru.practicum.shareit.validateGroups.Create;
+import ru.practicum.shareit.item.dto.ItemDtoForRequest;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
-public class ItemRequestDto {
+public class ItemRequestDtoForRequestor {
     private Long id;
-    @NotNull(groups = Create.class)
     private String description;
     private LocalDateTime created;
+    private List<ItemDtoForRequest> items;
 }
